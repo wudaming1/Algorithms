@@ -8,7 +8,7 @@ import com.aries.read.arithmetic.search.SST
  * 最佳情况查找时间复杂度logN，底数是2。
  * 基于迭代查找方式。
  */
-open class BSTreeR<Key : Comparable<Key>, Value> : SST<Key, Value> {
+open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
 
     protected var root: Node<Key, Value>? = null
 

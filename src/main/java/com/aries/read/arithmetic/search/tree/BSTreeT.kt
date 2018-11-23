@@ -6,8 +6,9 @@ import com.aries.read.arithmetic.search.SST
 /**
  * 二叉查找树.
  * 最佳情况查找时间复杂度logN，底数是2。
+ * 尝试用循环实现。未完成！
  */
-class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
+class BSTreeT<Key : Comparable<Key>, Value> : SST<Key, Value> {
 
     private var root: Node<Key, Value>? = null
     private var size = 0

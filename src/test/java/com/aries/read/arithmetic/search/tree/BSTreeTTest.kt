@@ -4,7 +4,7 @@ import com.aries.read.ResUtil
 import org.junit.Test
 import java.util.regex.Pattern
 
-class BSTreeTest {
+class BSTreeTTest {
     @Test
     fun testTinyCounter(){
         getMaxCount("search/tinyTale.txt",1)
@@ -28,7 +28,7 @@ class BSTreeTest {
      * @param length 长度小于等于这个值的单词都会被忽略
      */
     private fun getMaxCount(path:String,length: Int){
-        val st = BSTree<String, Int>()
+        val st = BSTreeT<String, Int>()
         val scanner = ResUtil.getScanner(this, path)
         val delimit = Pattern.compile(",|\\.| |\\r|\\n|\\s|--|-|!|\\?")
         scanner.useDelimiter(delimit)

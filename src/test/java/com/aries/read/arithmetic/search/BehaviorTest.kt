@@ -1,7 +1,7 @@
 package com.aries.read.arithmetic.search
 
+import com.aries.read.arithmetic.search.tree.BSTreeT
 import com.aries.read.arithmetic.search.tree.BSTree
-import com.aries.read.arithmetic.search.tree.BSTreeR
 import org.junit.Before
 import org.junit.Test
 
@@ -40,7 +40,7 @@ class BehaviorTest {
 
     @Test
     fun testBSTree(){
-        val st = BSTree<Char,Int>()
+        val st = BSTreeT<Char,Int>()
 
         input.forEachIndexed { index, c ->
             st.put(c,index)
@@ -50,7 +50,7 @@ class BehaviorTest {
 
     @Test
     fun testBSTreeR(){
-        val st = BSTreeR<Char,Int>()
+        val st = BSTree<Char,Int>()
 
         input.forEachIndexed { index, c ->
             st.put(c,index)
