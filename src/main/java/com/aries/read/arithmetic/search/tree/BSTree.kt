@@ -6,143 +6,117 @@ import com.aries.read.arithmetic.search.SST
 /**
  * 二叉查找树.
  * 最佳情况查找时间复杂度logN，底数是2。
+ * 基于迭代查找方式。
  */
-class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
+open class BSTreeR<Key : Comparable<Key>, Value> : SST<Key, Value> {
 
-    private var root: Node<Key, Value>? = null
-    private var size = 0
+    protected var root: Node<Key, Value>? = null
 
     override fun min(): Key? {
-        return root?.findMin()?.key
+        val node = root ?: return null
+        return min(node).key
+    }
+
+    private fun min(node: Node<Key, Value>): Node<Key, Value> {
+        val left = node.left ?: return node
+        return min(left)
     }
 
     override fun max(): Key? {
-        return root?.findMax()?.key
+        val node = root ?: return null
+        return max(node).key
+    }
+
+    private fun max(node: Node<Key, Value>): Node<Key, Value> {
+        val right = node.right ?: return node
+        return max(right)
     }
 
     override fun floor(key: Key): Key? {
-        if (root == null)
-            return null
-        return floor(root!!, key)?.key
+        return floor(root, key)?.key
     }
 
-    private fun floor(node: Node<Key, Value>, key: Key): Node<Key, Value>? {
-        if (key > node.key) {
-            val right = node.right ?: return node
-            return floor(right, key) ?: node
-        }
-        if (key < node.key) {
-            val left = node.left ?: return null
-            return floor(left, key)
+    private fun floor(node: Node<Key, Value>?, key: Key): Node<Key, Value>? {
+        if (node == null) return null
+        val cmp = key.compareTo(node.key)
+        if (cmp > 0) {
+            //在右子树找比key小的最大值,没有的话就是自己
+            return floor(node.right, key) ?: node
+        } else if (cmp < 0) {
+            return floor(node.left, key)
         }
         return node
     }
 
     override fun ceiling(key: Key): Key? {
-        if (root == null)
-            return null
-        return ceiling(root!!, key)?.key
+        return ceiling(root, key)?.key
     }
 
-    private fun ceiling(node: Node<Key, Value>, key: Key): Node<Key, Value>? {
-        if (key > node.key) {
-            val right = node.right ?: return node
-            return ceiling(right, key) ?: node
+    private fun ceiling(node: Node<Key, Value>?, key: Key): Node<Key, Value>? {
+        if (node == null) return null
+        val cmp = key.compareTo(node.key)
+        if (cmp > 0) {
+            return ceiling(node.right, key)
+        } else if (cmp < 0) {
+            val t = ceiling(node.left, key)
+            return t ?: node
+        }
+        return node
+    }
+
+    override fun select(k: Int): Key? {
+        return select(root, k)?.key
+    }
+
+    private fun select(node: Node<Key, Value>?, k: Int): Node<Key, Value>? {
+        if (node == null) return null
+        val rank = size(node.left) + 1
+        if (rank < k) {
+            return select(node.right, k)
+        } else if (rank > k) {
+            return select(node.left, k)
         }
         return node
     }
 
     override fun rank(key: Key): Int {
-        val queue = Queue<Key>()
-        root?.apply { keys(this, queue, this.findMin().key, key) }
-        return queue.size()
-    }
-
-    override fun select(k: Int): Key? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun deleteMax(): Value? {
-        val node = root?.findMax() ?: return null
-        val value = node.value
-        val replace = node.deleteFormTree()
-        if (replace?.parent == null){
-            root = replace
+        val node = floor(root, key)
+        if (node != null && node.key == key) {
+            return (node.left?.size ?: 0) + 1
         }
-        return value
-    }
+        return node?.size ?: 0
 
-    override fun deleteMin(): Value? {
-        val node = root?.findMin() ?: return null
-        val value = node.value
-        val replace = node.deleteFormTree()
-        if (replace?.parent == null){
-            root = replace
-        }
-        return value
-    }
-
-    override fun size(lo: Key, hi: Key): Int {
-        val queue = Queue<Key>()
-        root?.apply { keys(this, queue, lo, hi) }
-        return queue.size()
     }
 
     override fun put(key: Key, value: Value) {
-        if (root == null) {
-            root = Node(key, value)
-        } else {
-            var cursor = root
-            while (cursor != null) {
-                when {
-                    key > cursor.key -> {
-                        if (cursor.right == null) {
-                            val node = Node(key, value)
-                            cursor.right = node
-                            node.parent = cursor
-                            size++
-                        }
-                        cursor = cursor.right
-
-
-                    }
-                    key < cursor.key -> {
-                        if (cursor.left == null) {
-                            val node = Node(key, value)
-                            cursor.left = node
-                            node.parent = cursor
-                            size++
-                        }
-                        cursor = cursor.left
-                    }
-                    else -> {
-                        cursor.value = value
-                        return
-                    }
-                }
-            }
-        }
+        root = put(root, key, value)
     }
 
-    private fun put(x:Node<Key,Value>?,key: Key,value: Value):Node<Key,Value>{
-        if (x == null) return Node(key,value)
+    private fun put(x: Node<Key, Value>?, key: Key, value: Value): Node<Key, Value> {
+        if (x == null) return Node(key, value)
         val cmp = key.compareTo(x.key)
-        when{
-            cmp > 0 -> x.right = put(x.right,key, value)
-            cmp < 0 -> x.left = put(x.left,key, value)
+        when {
+            cmp > 0 -> x.right = put(x.right, key, value)
+            cmp < 0 -> x.left = put(x.left, key, value)
             else -> x.value = value
         }
         x.size = size(x.left) + size(x.right) + 1
         return x
     }
 
-    private fun size(node: Node<Key, Value>?):Int{
-        if (node == null) return  0
-        return node.size
-    }
 
     override fun get(key: Key): Value? {
-        return getNode(key)?.value
+        return get(root, key)
+    }
+
+    private fun get(x: Node<Key, Value>?, key: Key): Value? {
+        if (x == null) return null
+        val cmp = key.compareTo(x.key)
+        return when {
+            cmp > 0 -> get(x.right, key)
+            cmp < 0 -> get(x.left, key)
+            else -> x.value
+        }
     }
 
     private fun getNode(key: Key): Node<Key, Value>? {
@@ -166,16 +140,85 @@ class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
     override fun delete(key: Key): Value? {
         val node = getNode(key) ?: return null
         val value = node.value
-        val replace = node.deleteFormTree()
-        if (replace?.parent == null){
-            root = replace
-        }
-        size--
+        root = delete(root, key)
         return value
     }
 
+    /**
+     * @return 相对根节点
+     * 在[node]为根节点的子树中删除[key]节点
+     */
+    private fun delete(node: Node<Key, Value>?, key: Key): Node<Key, Value>? {
+        var head: Node<Key, Value> = node ?: return null
+        val cmp = key.compareTo(head.key)
+        when {
+            cmp > 0 -> head.right = delete(head.right, key)
+            cmp < 0 -> head.left = delete(head.left, key)
+            else -> {
+                val right = head.right
+                if (head.left == null) return head.right
+                if (right == null) return head.left
+                val t = head
+                head = min(right)
+                t.right = deleteMin(right)
+                head.left = t.left
+                head.right = t.right
+            }
+        }
+        resizeNode(head)
+        return head
+    }
+
+    override fun deleteMax(): Value? {
+        val node = root ?: return null
+        val max = max(node)
+        root = deleteMax(root)
+        return max.value
+    }
+
+    /**
+     * @return 相对根节点
+     * 删除以[node]为根节点的子树的最大节点
+     */
+    private fun deleteMax(node: Node<Key, Value>?): Node<Key, Value>? {
+        if (node == null) return null
+        if (node.right == null) return node.left
+        node.right = deleteMax(node.right)
+        resizeNode(node)
+        return node
+    }
+
+    override fun deleteMin(): Value? {
+        val node = root ?: return null
+        val min = min(node)
+        root = deleteMin(root)
+        return min.value
+
+    }
+
+    /**
+     * @return 相对根节点
+     * 删除以[node]为根节点的子树的最小节点
+     */
+    private fun deleteMin(node: Node<Key, Value>?): Node<Key, Value>? {
+        if (node == null) return null
+        if (node.left == null) return node.right
+        node.left = deleteMin(node.left)
+        resizeNode(node)
+        return node
+    }
+
     override fun size(): Int {
-        return size
+        return size(root)
+    }
+
+    override fun size(lo: Key, hi: Key): Int {
+        return rank(hi) - rank(lo)
+    }
+
+    private fun size(node: Node<Key, Value>?): Int {
+        if (node == null) return 0
+        return node.size
     }
 
     override fun keys(lo: Key, hi: Key): Iterator<Key> {
@@ -188,7 +231,8 @@ class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
     override fun keys(): Iterator<Key> {
         val queue = Queue<Key>()
         root?.apply {
-            keys(this, queue, this.findMin().key, this.findMax().key)
+            //root不空的情况下。max和min方法一定不空
+            keys(this, queue, min()!!, max()!!)
         }
         return queue.iterator()
     }
@@ -208,97 +252,13 @@ class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         }
     }
 
+    private fun resizeNode(node: Node<Key, Value>) {
+        node.size = size(node.left) + size(node.right) + 1
+    }
 
-    private class Node<Key, Value>(val key: Key, var value: Value,var size:Int = 1) {
+    open class Node<Key, Value>(val key: Key, var value: Value, var size: Int = 1) {
         var left: Node<Key, Value>? = null
         var right: Node<Key, Value>? = null
-        var parent: Node<Key, Value>? = null
-
-        /**
-         * 删除当前节点后的替代节点
-         */
-        fun deleteFormTree(): Node<Key, Value>? {
-            val replaceNode = findReplaceNode()
-            if (replaceNode == null) {
-                if (parent?.left == this)
-                    parent?.left = null
-                else
-                    parent?.right = null
-            } else {
-                replaceWith(replaceNode)
-            }
-            return replaceNode
-
-        }
-
-        /**
-         * @param node 替换当前节点的新节点
-         */
-        fun replaceWith(node: Node<Key, Value>) {
-
-            val nodeParent = node.parent ?: return
-            if (nodeParent.left == node) {
-                nodeParent.left = node.right
-                node.right?.parent = nodeParent
-            } else {
-                nodeParent.right = node.right
-                node.right?.parent = nodeParent
-            }
-
-
-            val isLeftChild = parent?.left == this
-            if (left != node)
-                node.left = left
-            if (right != node)
-                node.right = right
-            node.parent = parent
-            if (isLeftChild) {
-                parent?.left = node
-            } else {
-                parent?.right = node
-            }
-            parent = null
-            left = null
-            right = null
-        }
-
-
-        /**
-         * 查找左子树的最大值，或者右子树的最小值
-         */
-        private fun findReplaceNode(): Node<Key, Value>? {
-            if (right != null) {
-                return right?.findMax()
-            }
-
-            if (left != null) {
-                return left?.findMin()
-            }
-            return null
-        }
-
-        fun findMax(): Node<Key, Value> {
-            var cursor = this
-            while (cursor.right != null) {
-                cursor = cursor.right!!
-            }
-            return cursor
-        }
-
-        fun findMin(): Node<Key, Value> {
-            var cursor = this
-            while (cursor.left != null) {
-                cursor = cursor.left!!
-            }
-            return cursor
-        }
-
-//        fun childrenCount():Int{
-//            var cursor:Node<Key,Value>? = this
-//            while (cursor!= null){
-//
-//            }
-//        }
     }
 
 }
