@@ -17,7 +17,7 @@ open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         return min(node).key
     }
 
-    private fun min(node: Node<Key, Value>): Node<Key, Value> {
+    protected fun min(node: Node<Key, Value>): Node<Key, Value> {
         val left = node.left ?: return node
         return min(left)
     }
@@ -216,7 +216,7 @@ open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         return rank(hi) - rank(lo)
     }
 
-    private fun size(node: Node<Key, Value>?): Int {
+    protected fun size(node: Node<Key, Value>?): Int {
         if (node == null) return 0
         return node.size
     }
@@ -252,13 +252,14 @@ open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         }
     }
 
-    private fun resizeNode(node: Node<Key, Value>) {
+    protected fun resizeNode(node: Node<Key, Value>) {
         node.size = size(node.left) + size(node.right) + 1
     }
 
     open class Node<Key, Value>(val key: Key, var value: Value, var size: Int = 1) {
         var left: Node<Key, Value>? = null
         var right: Node<Key, Value>? = null
+        var isRed: Boolean = true
     }
 
 }
