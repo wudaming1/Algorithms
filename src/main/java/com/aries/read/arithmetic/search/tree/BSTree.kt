@@ -256,7 +256,7 @@ open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         node.size = size(node.left) + size(node.right) + 1
     }
 
-    open class Node<Key, Value>(val key: Key, var value: Value, var size: Int = 1) {
+    open class Node<Key, Value>(var key: Key, var value: Value, var size: Int = 1) {
         var left: Node<Key, Value>? = null
         var right: Node<Key, Value>? = null
         var isRed: Boolean = true

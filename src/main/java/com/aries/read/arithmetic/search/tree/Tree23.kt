@@ -40,43 +40,68 @@ class Tree23<Key : Comparable<Key>, Value> : BSTree<Key, Value>() {
     }
 
     /**
-     * @return 伪根节点
+     * 在以[node]为根节点的子树中删除最小键
+     * @return 删除后的新子树根节点
      */
     private fun deleteMin(node: Node<Key, Value>): Node<Key, Value>? {
-        val left = node.left?:return null
-        if ()
+        val left = node.left ?: return null
+        //保证没有两条连续的黑色左链接
+        if (!isRed(left) && !isRed(left.left)) {
+            moveRedLeft(node)
+        }
         node.left = deleteMin(left)
-
+        return balance(node)
     }
 
     /**
-     * @param [node]一定不是2节点，即本身是红色或者有红色子节点。
+     * 在以[node]为根节点的树中删除[key]
+     * @param [node]不属于2节点，[node]：红
+     * @return 放入查找路径的节点
      */
-    private fun delete(node: Node<Key, Value>?, key: Key): Node<Key, Value>? {
-        if (node == null) return null
+    private fun delete(node: Node<Key, Value>, key: Key): Node<Key, Value>? {
+        var h = node
         val cmp = key.compareTo(node.key)
+        if (cmp < 0) {
+            if (!isRed(node.left) && !isRed(node.left?.left)) {
+                moveRedLeft(node)
+            }
+            node.left = delete(node.left!!, key)
+        } else {
+            if (isRed(node.left)) {
+                h = rotateRight(node)
+            }
+            //叶子节点，且红
+            if (key.compareTo(h.key) == 0 && h.right == null)
+                return null
 
-        when{
-            cmp > 0 -> {
+            if (!isRed(h.right) && !isRed(h.right?.left))
+                h = moveRedRight(h)
 
+            if (key.compareTo(h.key) == 0) {
+                val right = node.right ?: return null
+                val min = min(right)
+                node.key = min.key
+                node.value = min.value
+                node.right = deleteMin(right)
+            } else {
+                h.right = delete(h.right!!, key)
             }
         }
-
-        if (cmp == 0){
-            val min = min(node.right)
-        }
-
-        if (!isRed(node.left?.left) && !isRed(node.right?.left)){
-
-        }
-
-
+        return balance(h)
     }
 
     override fun delete(key: Key): Value? {
-        return delete(root, key)?.value
+        val node = root ?: return null
+        if (!isRed(node.left) && !isRed(node.right)) {
+            node.isRed = true
+        }
+
+        val result = delete(node, key)
+        root?.isRed = false
+        return result?.value
     }
 
+    //红黑树辅助方法
     /**
      * 空节点也是黑节点
      */
@@ -110,7 +135,7 @@ class Tree23<Key : Comparable<Key>, Value> : BSTree<Key, Value>() {
      * 1、指向[node]节点的链接是红色的
      * 2、[node]的左链接是红色的。
      */
-    private fun rotateRigth(node: Node<Key, Value>): Node<Key, Value> {
+    private fun rotateRight(node: Node<Key, Value>): Node<Key, Value> {
         val left = node.left!!
         //变化层级结构
         node.left = left.right
@@ -124,24 +149,58 @@ class Tree23<Key : Comparable<Key>, Value> : BSTree<Key, Value>() {
         return left
     }
 
+    /**
+     * 分裂或者合并4节点
+     */
     private fun flipColor(node: Node<Key, Value>) {
-        node.isRed = node != root
-        node.left?.isRed = false
-        node.right?.isRed = false
+        node.isRed = !node.isRed
+        node.left?.isRed = !isRed(node.left)
+        node.right?.isRed = !isRed(node.right)
 
     }
 
     /**
      * 在不改变树的平衡性的前提下，修复不符合（2-3）红黑树性质的节点
      */
-    private fun balance(node: Node<Key, Value>): Node<Key, Value>{
+    private fun balance(node: Node<Key, Value>): Node<Key, Value> {
         var parent = node
         //一次对于parent是红色情况，左旋后必定紧跟右旋，右旋后必定紧跟变色，但是左旋、右旋之间会各一个方法栈，以定位合适的旋转节点。
         //这个判断及旋转包含两种情况：2节点插入右节点，3节点插入右节点。
         if (!isRed(parent.left) && isRed(parent.right)) parent = rotateLeft(parent)
-        if (isRed(parent.left?.left) && isRed(parent.left)) parent = rotateRigth(parent)
+        if (isRed(parent.left?.left) && isRed(parent.left)) parent = rotateRight(parent)
         if (isRed(parent.left) && isRed(parent.right)) flipColor(parent)
         parent.size = size(parent.left) + size(parent.right) + 1
         return parent
+    }
+
+    /**
+     * 调用这个方法的前提是
+     * node：红
+     * node.left：黑
+     * node.left.left：黑
+     * node.left节点是2节点的判断。
+     */
+    private fun moveRedLeft(node: Node<Key, Value>): Node<Key, Value> {
+        var p = node
+        flipColor(p)
+
+        if (isRed(p.right?.left)) {
+            //修复右子树
+            //isRed(node.right?.left)保证node.right不空
+            p.right = rotateRight(p.right!!)
+            p = rotateLeft(p)
+            flipColor(p)
+        }
+        return p
+    }
+
+    private fun moveRedRight(node: Node<Key, Value>): Node<Key, Value> {
+        var p = node
+        flipColor(p)
+        if (isRed(p.left?.left)) {
+            p = rotateRight(p)
+            flipColor(p)
+        }
+        return p
     }
 }
