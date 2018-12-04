@@ -2,6 +2,7 @@ package com.aries.read.arithmetic.search
 
 import com.aries.read.arithmetic.search.tree.BSTreeT
 import com.aries.read.arithmetic.search.tree.BSTree
+import com.aries.read.arithmetic.search.tree.Tree23
 import org.junit.Before
 import org.junit.Test
 
@@ -10,63 +11,72 @@ import org.junit.Test
  * 符号表轨迹测试
  */
 class BehaviorTest {
-    private val input = arrayOf('S','E','A','R','C','H','E','X','A','M','P','L','E')
+    private val input = arrayOf('S', 'E', 'A', 'R', 'C', 'H', 'E', 'X', 'A', 'M', 'P', 'L', 'E')
 
     @Before
-    fun before(){
+    fun before() {
         println("数据大小：${input.size}\n")
     }
 
     @Test
-    fun testST(){
-        val st = LinkST<Char,Int>()
+    fun testST() {
+        val st = LinkST<Char, Int>()
         input.forEachIndexed { index, c ->
-            st.put(c,index)
+            st.put(c, index)
         }
-        for (key in st.keys()){
+        for (key in st.keys()) {
             println("$key--${st.get(key)}")
         }
 
     }
 
     @Test
-    fun testSST(){
-        val st = LinkedSST<Char,Int>()
+    fun testSST() {
+        val st = LinkedSST<Char, Int>()
         input.forEachIndexed { index, c ->
-            st.put(c,index)
+            st.put(c, index)
         }
         printST(st)
     }
 
     @Test
-    fun testBSTree(){
-        val st = BSTreeT<Char,Int>()
+    fun testBSTree() {
+        val st = BSTreeT<Char, Int>()
 
         input.forEachIndexed { index, c ->
-            st.put(c,index)
+            st.put(c, index)
         }
         printST(st)
     }
 
     @Test
-    fun testBSTreeR(){
-        val st = BSTree<Char,Int>()
+    fun testBSTreeR() {
+        val st = BSTree<Char, Int>()
 
         input.forEachIndexed { index, c ->
-            st.put(c,index)
+            st.put(c, index)
+        }
+        printST(st)
+    }
+
+    @Test
+    fun testTree23() {
+        val st = Tree23<Char, Int>()
+        input.forEachIndexed { index, c ->
+            st.put(c, index)
         }
         printST(st)
     }
 
 
     @Test
-    fun testBSST(){
+    fun testBSST() {
         val st = BSST()
-        val input = arrayOf("S","E","A","R","C","H","E","X","A","M","P","L","E")
+        val input = arrayOf("S", "E", "A", "R", "C", "H", "E", "X", "A", "M", "P", "L", "E")
         input.forEachIndexed { index, c ->
-            st.put(c,index)
+            st.put(c, index)
         }
-        for (key in st.keys("A","R")){
+        for (key in st.keys("A", "R")) {
             println("$key--${st.get(key)}")
         }
 
@@ -84,46 +94,46 @@ class BehaviorTest {
     }
 
 
-    private fun printST(st:SST<Char,Int>){
-        for (key in st.keys('A','R')){
+    private fun printST(st: SST<Char, Int>) {
+        for (key in st.keys('A', 'R')) {
             println("$key--${st.get(key)}")
         }
 
         println("----")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             println("$key--${st.get(key)}")
         }
 
 
         println("----")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
 
         println("\n----")
         println("删除S:${st.delete('S')},剩余大小：${st.size()}")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
         println("\n----")
         println("删除A:${st.delete('A')},剩余大小：${st.size()}")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
         println("\n----")
         println("删除M:${st.delete('M')},剩余大小：${st.size()}")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
         println("\n----")
         println("删除R:${st.delete('R')},剩余大小：${st.size()}")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
 
         println("\n----")
         println("删除X:${st.delete('X')},剩余大小：${st.size()}")
-        for (key in st.keys()){
+        for (key in st.keys()) {
             print("$key--")
         }
 
@@ -131,7 +141,7 @@ class BehaviorTest {
 
         println("\n----")
 
-        for (key in st.keys()){
+        for (key in st.keys()) {
             println("$key--${st.get(key)}")
         }
     }

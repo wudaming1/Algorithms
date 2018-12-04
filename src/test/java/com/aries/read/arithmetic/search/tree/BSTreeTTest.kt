@@ -40,6 +40,7 @@ class BSTreeTTest {
         }
         var max = "max"
         st.put(max,0)
+        val time = System.currentTimeMillis()
         for (word in st.keys()){
             if (st.get(max)!! < st.get(word)!!){
                 max = word
@@ -47,5 +48,6 @@ class BSTreeTTest {
         }
         println("$max:${st.get(max)}")
         println("business:${st.get("business")}")
+        println("查询耗时：${System.currentTimeMillis() -time}")
     }
 }
