@@ -10,7 +10,7 @@ import com.aries.read.arithmetic.search.SST
  */
 open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
 
-    protected var root: Node<Key, Value>? = null
+    var root: Node<Key, Value>? = null
 
     override fun min(): Key? {
         val node = root ?: return null
@@ -260,6 +260,10 @@ open class BSTree<Key : Comparable<Key>, Value> : SST<Key, Value> {
         var left: Node<Key, Value>? = null
         var right: Node<Key, Value>? = null
         var isRed: Boolean = true
+
+        override fun toString(): String {
+            return "{$key,$value}"
+        }
     }
 
 }

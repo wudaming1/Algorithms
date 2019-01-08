@@ -68,6 +68,7 @@ class Tree23<Key : Comparable<Key>, Value> : BSTree<Key, Value>() {
             node.left = delete(node.left!!, key)
         } else {
             if (isRed(node.left)) {
+                //node是一个4节点时，可能出现这种情况！
                 h = rotateRight(node)
             }
             //叶子节点，且红
