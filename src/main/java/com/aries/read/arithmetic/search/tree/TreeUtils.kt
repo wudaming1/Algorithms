@@ -6,17 +6,26 @@ object TreeUtils {
 
 
     /**
-     * 前序+中序还原二叉树
+     * 前序+中序还原二叉树。
+     * 中序排序确定左右子树。
+     * 前序遍历确定根节点。
+     * @param pre 前序遍历结果
+     * @param middle 中序遍历结果
      */
-    fun <Key, Value> restoreFormPre(pre: Array<BSTree.Node<Key, Value>>, middle: Array<BSTree.Node<Key, Value>>): BSTree.Node<Key, Value>? {
+    fun <Key, Value> restoreFormPre(pre: Array<BSTree.Node<Key, Value>>,
+                                    middle: Array<BSTree.Node<Key, Value>>): BSTree.Node<Key, Value>? {
         if (pre.isEmpty() || pre.size != middle.size)
             return null
 
         val root = pre[0]
         middle.forEachIndexed { index, node ->
             if (node.key == root.key) {
-                root.left = restoreFormPre(Arrays.copyOfRange(pre, 1, index + 1), Arrays.copyOfRange(middle, 0, index))
-                root.right = restoreFormPre(Arrays.copyOfRange(pre, index + 1, pre.size), Arrays.copyOfRange(middle, index + 1, middle.size))
+                root.left = restoreFormPre(
+                        Arrays.copyOfRange(pre, 1, index + 1),
+                        Arrays.copyOfRange(middle, 0, index))
+                root.right = restoreFormPre(
+                        Arrays.copyOfRange(pre, index + 1, pre.size),
+                        Arrays.copyOfRange(middle, index + 1, middle.size))
             }
         }
         return root
@@ -24,6 +33,11 @@ object TreeUtils {
 
     /**
      * 后序+中序还原二叉树
+     * 中序遍历确定左右子树
+     * 后序遍历确定根节点
+     *
+     * @param post 后序遍历结果
+     * @param middle 前序遍历结果
      */
     fun <Key, Value> restoreFormPost(post: Array<BSTree.Node<Key, Value>>, middle: Array<BSTree.Node<Key, Value>>): BSTree.Node<Key, Value>? {
         if (post.isEmpty() || post.size != middle.size)
@@ -32,7 +46,8 @@ object TreeUtils {
         val root = post.last()
         middle.forEachIndexed { index, node ->
             if (node.key == root.key) {
-                root.left = restoreFormPost(Arrays.copyOfRange(post, 0, index), Arrays.copyOfRange(middle, 0, index))
+                root.left = restoreFormPost(Arrays.copyOfRange(post, 0, index),
+                        Arrays.copyOfRange(middle, 0, index))
                 root.right = restoreFormPost(Arrays.copyOfRange(post, index, post.size - 1), Arrays.copyOfRange(middle, index + 1, middle.size))
             }
         }
@@ -42,7 +57,7 @@ object TreeUtils {
 
 
     /**
-     * 前序遍历
+     * 前序遍历 父-左-右
      * @param root 根节点
      * @param out 遍历输出结果
      */
@@ -57,7 +72,7 @@ object TreeUtils {
     }
 
     /**
-     * 中序遍历
+     * 中序遍历 左-父-右
      * @param root 根节点
      * @param out 遍历输出结果
      */
@@ -73,7 +88,7 @@ object TreeUtils {
 
 
     /**
-     * 后序遍历
+     * 后序遍历 左-右-父
      * @param root 根节点
      * @param out 遍历输出结果
      */
