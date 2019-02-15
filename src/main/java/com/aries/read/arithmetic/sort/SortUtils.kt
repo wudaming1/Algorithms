@@ -40,13 +40,59 @@ object SortUtils {
      * 对部分有序的数组来排序比选择和冒泡要快。
      */
     fun <T : Comparable<T>> insertSort(a: Array<T>) {
-        for (i in 0..a.lastIndex) {
+        for (i in 1..a.lastIndex) {
             //比较时倒序比较会略微好一点。
-            for (j in i-1 downTo 0) {
-                if (a[i] < a[j]) {
-                    insertBefore(a, j, i)
+            for (j in i - 1 downTo 0) {
+                if (a[i] > a[j]) {
+                    insertBefore(a, j + 1, i)
+                    break
                 }
             }
+        }
+    }
+
+    /**
+     * 插入排序
+     * 进行N次循环，每次循环将无序序列中的第一个元素插入有序序列的合适位置。
+     * 对部分有序的数组来排序比选择和冒泡要快。
+     * 将数组由小到大排序。
+     */
+    fun <T : Comparable<T>> insertSortRaw(a: Array<T>) {
+        for (i in 1..a.lastIndex) {
+            //让数组的前i+1个元素有序
+            for (j in i downTo 1) {
+                if (a[j] < a[j - 1]) {
+                    exch(a, j - 1, j)
+                } else {
+                    break
+                }
+            }
+        }
+    }
+
+    /**
+     * 希尔排序
+     * 插入排序的改进版本，实现在最坏情况下的时间复杂度是N的3/2次方。
+     * 当h=1时，就是[insertSortRaw]。
+     */
+    fun <T : Comparable<T>> shellSort(a: Array<T>) {
+        var h = 1
+        val N = a.size
+        while (3 * h < N) h = 3 * h + 1
+        //h=1时，就是插入排序
+        while (h >= 1) {
+            //使数组H有序
+            for (i in h..a.lastIndex) {
+                //使得i前面部分的数组是H有序的。
+                for (j in i downTo h) {
+                    if (a[j] < a[j - h]) {
+                        exch(a, j, j - h)
+                    }else{
+                        break
+                    }
+                }
+            }
+            h /= 3
         }
     }
 
