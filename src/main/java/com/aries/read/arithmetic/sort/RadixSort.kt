@@ -2,7 +2,7 @@ package com.aries.read.arithmetic.sort
 
 
 /**
- * 基数排序
+ * 基数排序，可以看做是计数排序的变种
  * 基数：除开位置信息外的所有元素。
  * exp：数值-[1,2,3,4,5,6,7,8,9,0]
  *      字符串-字母表
@@ -26,12 +26,24 @@ class RadixSort(private val mDigit: Int) : AbsSort<Int>() {
      * 数学归纳法可以证明从低位到高位排序后整体是有序的。
      */
     private fun sortByDigit(digit: Int, a: Array<Int>) {
-        val bucket = Array(10) { mutableListOf<Int>() }
+        val bucket = IntArray(10)
         a.forEach {
-            bucket[getDigitNumber(digit, it)].add(it)
+            bucket[getDigitNumber(digit, it)]+=1
         }
-        writeBackTo(bucket, a)
 
+        for (i in 1..9){
+            bucket[i] +=bucket[i-1]
+        }
+        val out = a.clone()
+        a.forEach {
+            var index =  bucket[getDigitNumber(digit, it)]
+            out[index] = it
+            bucket[getDigitNumber(digit, it)] = --index
+        }
+
+        out.forEachIndexed { index, i ->
+            a[index] = i
+        }
     }
 
     /**
@@ -41,15 +53,5 @@ class RadixSort(private val mDigit: Int) : AbsSort<Int>() {
         val divisor = Math.pow(10.toDouble(), (digit - 1).toDouble())
         val division = a / divisor
         return (division % (divisor * 10)).toInt()
-    }
-
-    private fun writeBackTo(bucket: Array<MutableList<Int>>, a: Array<Int>) {
-        var i = 0
-        bucket.forEach {
-            it.forEach { element ->
-                a[i++] = element
-            }
-        }
-
     }
 }
